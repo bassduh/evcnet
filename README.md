@@ -206,6 +206,40 @@ template:
         {{ logs[0].NOT }}
 ```
 
+### Calculate costs last completed charging session
+
+Create a template sensor with the costs of the last completed charging session in configuration.yaml
+
+```yaml
+template:
+  - sensor:
+      - name: "Cost completed charging session"
+        unique_id: evc_net_cost_completed_charging_session
+        unit_of_measurement: "EUR"
+        state_class: measurement
+        device_class: monetary
+        state: >
+          {% set tarief = 0.40 %} {# Define your kWh-tariff #}
+          {% set sensor = 'sensor.charge_spot_<YOUR_SPOT_ID>_last_logging_update' %}
+
+          {% if state_attr(sensor, 'entries') is not none %}
+            {# Filter entries: find 'Commit transactie' #}
+            {% set completed_sessions = state_attr(sensor, 'entries')
+               | selectattr('NOT', 'eq', 'Commit transactie')
+               | selectattr('ENG', 'defined')
+               | selectattr('ENG', 'ne', none) | list %}
+
+            {% if completed_sessions | length > 0 %}
+              {% set kwh = completed_sessions[0].ENG | float(0) %}
+              {{ (kwh * tarief) | round(2) }}
+            {% else %}
+              0.00
+            {% endif %}
+          {% else %}
+            0.00
+          {% endif %}
+```
+
 ## Troubleshooting
 
 Enable debug logging by adding this to your `configuration.yaml`:
