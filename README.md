@@ -217,7 +217,7 @@ template:
       - name: "EvcNet Cost completed charging session"
         unique_id: evcnet_cost_completed_charging_session
         unit_of_measurement: "EUR"
-        state_class: measurement
+        state_class: total
         device_class: monetary
         state: >
           {% set tariff = 0.40 %} {# Define your kWh-tariff #}
