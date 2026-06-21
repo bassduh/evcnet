@@ -199,7 +199,8 @@ Create a template sensor with the latest status from the logging in configuratio
 ```yaml
 template:
   -sensor:
-    - name: "Last logging status"
+    - name: "EvcNet Last logging status"
+      unique_id: evcnet_last_logging_status
       state: >
         {% set sensor = 'sensor.charge_spot_<YOUR_SPOT_ID>_last_logging_update' %}
         {% set logs = state_attr(sensor, 'entries') %}
@@ -213,13 +214,13 @@ Create a template sensor with the costs of the last completed charging session i
 ```yaml
 template:
   - sensor:
-      - name: "Cost completed charging session"
-        unique_id: evc_net_cost_completed_charging_session
+      - name: "EvcNet Cost completed charging session"
+        unique_id: evcnet_cost_completed_charging_session
         unit_of_measurement: "EUR"
         state_class: measurement
         device_class: monetary
         state: >
-          {% set tarief = 0.40 %} {# Define your kWh-tariff #}
+          {% set tariff = 0.40 %} {# Define your kWh-tariff #}
           {% set sensor = 'sensor.charge_spot_<YOUR_SPOT_ID>_last_logging_update' %}
 
           {% if state_attr(sensor, 'entries') is not none %}
@@ -231,7 +232,7 @@ template:
 
             {% if completed_sessions | length > 0 %}
               {% set kwh = completed_sessions[0].ENG | float(0) %}
-              {{ (kwh * tarief) | round(2) }}
+              {{ (kwh * tariff) | round(2) }}
             {% else %}
               0.00
             {% endif %}
